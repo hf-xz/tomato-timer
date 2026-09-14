@@ -4,6 +4,7 @@ import SwiftUI
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        NotificationManager.shared.registerCategories()
         NotificationManager.shared.requestAuthorization()
     }
 }
@@ -16,7 +17,9 @@ struct TomatoTimerApp: App {
 
     init() {
         let settings = SettingsStore()
-        _controller = StateObject(wrappedValue: TimerController(settings: settings))
+        let controller = TimerController(settings: settings)
+        NotificationManager.shared.controller = controller
+        _controller = StateObject(wrappedValue: controller)
     }
 
     var body: some Scene {

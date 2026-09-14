@@ -3,12 +3,42 @@ import Foundation
 import UserNotifications
 
 @MainActor
-final class NotificationManager: ObservableObject {
+final class NotificationManager: NSObject, ObservableObject {
     static let shared = NotificationManager()
 
     @Published var authorizationStatus: UNAuthorizationStatus = .notDetermined
 
-    private init() {}
+    weak var controller: TimerController?
+
+    static let startActionID = "START_NEXT"
+    static let laterActionID = "LATER"
+    static let timerFinishedCategoryID = "TIMER_FINISHED"
+
+    private override init() {
+        super.init()
+    }
+
+    func registerCategories() {
+        let startAction = UNNotificationAction(
+            identifier: Self.startActionID,
+            title: "开始",
+            options: []
+        )
+        let laterAction = UNNotificationAction(
+            identifier: Self.laterActionID,
+            title: "稍后",
+            options: []
+        )
+        let category = UNNotificationCategory(
+            identifier: Self.timerFinishedCategoryID,
+            actions: [startAction, laterAction],
+            intentIdentifiers: [],
+            options: []
+        )
+        let center = UNUserNotificationCenter.current()
+        center.setNotificationCategories([category])
+        center.delegate = self
+    }
 
     func requestAuthorization() {
         UNUserNotificationCenter.current()
@@ -32,25 +62,30 @@ final class NotificationManager: ObservableObject {
         )
     }
 
-    func sendWorkFinished() {
+    func sendWorkFinished(includeActions: Bool) {
         send(
             title: "番茄工作结束 🍅",
-            body: "干得不错！休息一下，让眼睛放松看看吧。"
+            body: "干得不错！休息一下，让眼睛放松看看吧。",
+            includeActions: includeActions
         )
     }
 
-    func sendBreakFinished() {
+    func sendBreakFinished(includeActions: Bool) {
         send(
             title: "休息结束 ☕️",
-            body: "准备好开始下一个番茄钟了吗？"
+            body: "准备好开始下一个番茄钟了吗？",
+            includeActions: includeActions
         )
     }
 
-    private func send(title: String, body: String) {
+    private func send(title: String, body: String, includeActions: Bool = false) {
         guard authorizationStatus == .authorized else { return }
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
+        if includeActions {
+            content.categoryIdentifier = Self.timerFinishedCategoryID
+        }
 
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,
@@ -62,5 +97,21 @@ final class NotificationManager: ObservableObject {
                 NSLog("[TomatoTimer] 通知投递失败: \(error.localizedDescription)")
             }
         }
+    }
+}
+
+extension NotificationManager: UNUserNotificationCenterDelegate {
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        let actionID = response.actionIdentifier
+        Task { @MainActor in
+            if actionID == Self.startActionID {
+                controller?.start()
+            }
+        }
+        completionHandler()
     }
 }

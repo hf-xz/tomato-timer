@@ -122,10 +122,11 @@ final class TimerController: ObservableObject {
             NSSound(named: "Glass")?.play()
         }
         if settings.notificationsEnabled {
+            let showActions = !settings.autoStartNext
             if mode == .break {
-                NotificationManager.shared.sendWorkFinished()
+                NotificationManager.shared.sendWorkFinished(includeActions: showActions)
             } else {
-                NotificationManager.shared.sendBreakFinished()
+                NotificationManager.shared.sendBreakFinished(includeActions: showActions)
             }
         }
 
