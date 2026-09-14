@@ -36,15 +36,24 @@ struct TimerView: View {
                         controller.isRunning ? "暂停" : "开始",
                         systemImage: controller.isRunning ? "pause.fill" : "play.fill"
                     )
-                    .frame(minWidth: 70)
+                    .frame(maxWidth: .infinity)
                 }
                 .controlSize(.large)
                 .keyboardShortcut(.space, modifiers: [])
 
                 Button {
+                    controller.skip()
+                } label: {
+                    Label("跳过", systemImage: "forward.fill")
+                        .frame(maxWidth: .infinity)
+                }
+                .controlSize(.large)
+
+                Button {
                     controller.reset()
                 } label: {
                     Label("重置", systemImage: "arrow.counterclockwise")
+                        .frame(maxWidth: .infinity)
                 }
                 .controlSize(.large)
             }

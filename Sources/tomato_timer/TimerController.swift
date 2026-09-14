@@ -95,6 +95,12 @@ final class TimerController: ObservableObject {
         remainingSeconds = totalSeconds
     }
 
+    func skip() {
+        pause()
+        mode = (mode == .work) ? .break : .work
+        remainingSeconds = totalSeconds
+    }
+
     private func tick() {
         guard isRunning, let endDate else { return }
         guard Date() < endDate else {
