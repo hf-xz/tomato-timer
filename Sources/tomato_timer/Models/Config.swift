@@ -37,6 +37,12 @@ final class SettingsStore: ObservableObject {
     @Published var notificationsEnabled: Bool {
         didSet { persist() }
     }
+    @Published var barkEnabled: Bool {
+        didSet { persist() }
+    }
+    @Published var barkURL: String {
+        didSet { persist() }
+    }
 
     init() {
         let defaults = UserDefaults.standard
@@ -45,12 +51,16 @@ final class SettingsStore: ObservableObject {
         let savedAutoStart = defaults.object(forKey: AppConstants.Keys.autoStartNext) as? Bool
         let savedSound = defaults.object(forKey: AppConstants.Keys.soundEnabled) as? Bool
         let savedNotifications = defaults.object(forKey: AppConstants.Keys.notificationsEnabled) as? Bool
+        let savedBarkEnabled = defaults.object(forKey: AppConstants.Keys.barkEnabled) as? Bool
+        let savedBarkURL = defaults.string(forKey: AppConstants.Keys.barkURL)
 
         workMinutes = savedWork ?? AppConstants.defaultWorkMinutes
         breakMinutes = savedBreak ?? AppConstants.defaultBreakMinutes
         autoStartNext = savedAutoStart ?? true
         soundEnabled = savedSound ?? true
         notificationsEnabled = savedNotifications ?? true
+        barkEnabled = savedBarkEnabled ?? false
+        barkURL = savedBarkURL ?? ""
     }
 
     private func persist() {
@@ -60,5 +70,7 @@ final class SettingsStore: ObservableObject {
         defaults.set(autoStartNext, forKey: AppConstants.Keys.autoStartNext)
         defaults.set(soundEnabled, forKey: AppConstants.Keys.soundEnabled)
         defaults.set(notificationsEnabled, forKey: AppConstants.Keys.notificationsEnabled)
+        defaults.set(barkEnabled, forKey: AppConstants.Keys.barkEnabled)
+        defaults.set(barkURL, forKey: AppConstants.Keys.barkURL)
     }
 }

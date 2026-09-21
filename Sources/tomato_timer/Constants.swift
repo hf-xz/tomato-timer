@@ -10,5 +10,7 @@ enum AppConstants {
         static let autoStartNext = "autoStartNext"
         static let soundEnabled = "soundEnabled"
         static let notificationsEnabled = "notificationsEnabled"
+        static let barkEnabled = "barkEnabled"
+        static let barkURL = "barkURL"
     }
 }

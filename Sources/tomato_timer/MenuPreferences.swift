@@ -22,6 +22,18 @@ struct MenuPreferences: View {
                 Toggle("提示音", isOn: $settings.soundEnabled)
                 Toggle("通知", isOn: $settings.notificationsEnabled)
             }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Toggle("手机推送 (Bark)", isOn: $settings.barkEnabled)
+                if settings.barkEnabled {
+                    TextField("https://api.day.app/xxxx", text: $settings.barkURL)
+                        .textFieldStyle(.roundedBorder)
+                    Button("测试推送") {
+                        BarkNotifier.shared.sendTest(url: settings.barkURL)
+                    }
+                    .disabled(settings.barkURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
         }
         .padding(.top, 6)
     }

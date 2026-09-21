@@ -129,6 +129,14 @@ final class TimerController: ObservableObject {
                 NotificationManager.shared.sendBreakFinished(includeActions: showActions)
             }
         }
+        if settings.barkEnabled {
+            let barkURL = settings.barkURL
+            if mode == .break {
+                BarkNotifier.shared.sendWorkFinished(url: barkURL)
+            } else {
+                BarkNotifier.shared.sendBreakFinished(url: barkURL)
+            }
+        }
 
         if settings.autoStartNext {
             endDate = Date().addingTimeInterval(TimeInterval(remainingSeconds))
